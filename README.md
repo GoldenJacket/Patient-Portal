@@ -121,3 +121,5 @@ The repo includes `.vscode/settings.json` to set Prettier as the default formatt
 }
 ```
 Then run `npm run format`.
+
+---
