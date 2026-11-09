@@ -10,6 +10,13 @@ This README explains how to set up the project locally, run the dev server, buil
 * Kumar Meenal — Technical Design
 * Zachary Wallace — Implementation & FHIR Integration
 
+## My Contributions (Zachary Wallace)
+Made 24 of 36 commits in the original team repository (private course repo).
+* **FHIR data layer:** built the SMART on FHIR R4 fetching and processing layer (`useFhir`, `fhirUtils`) for Patient, Observation, and Condition data
+* **Authentication:** implemented Supabase login/registration with FHIR patient-name verification and row-level-security-safe profile creation
+* **AI explanations:** integrated the Anthropic Claude API for plain-language lab result explanations, plus the lab results UI (values, dates, High/Low/Normal badges)
+* **Deployment & monitoring:** Cloudflare deployment config, proxy server, and Sentry error monitoring
+
 ## Features
 * User authentication (register/login) backed by Supabase
 * Personal patient profile stored per user
