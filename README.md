@@ -1,132 +1,82 @@
-# Patient Portal (Vite + React + MUI)
-This repository is a small patient portal demo built with Vite, React and Material UI.
-This README explains how to set up the project locally, run the dev server, build for production, format code with Prettier, and a few troubleshooting tips.
+# AI-Powered Patient Portal
 
-## Live Demo
-[cs6440-group1.pages.dev](https://cs6440-group1.pages.dev/)
+A patient-facing web app that pulls real health records over **SMART on FHIR R4** and uses an LLM to explain lab results in plain language, deliberately scoped as patient education, not diagnosis.
 
-## Team
-* Carmen Lam — Project Topic & Frontend
-* Kumar Meenal — Technical Design
-* Zachary Wallace — Implementation & FHIR Integration
+**Live demo:** [cs6440-group1.pages.dev](https://cs6440-group1.pages.dev/) · Georgia Tech CS 6440 (Introduction to Health Informatics), Spring 2026
 
-## My Contributions (Zachary Wallace)
-Made 24 of 36 commits in the original team repository (private course repo).
-* **FHIR data layer:** built the SMART on FHIR R4 fetching and processing layer (`useFhir`, `fhirUtils`) for Patient, Observation, and Condition data
-* **Authentication:** implemented Supabase login/registration with FHIR patient-name verification and row-level-security-safe profile creation
-* **AI explanations:** integrated the Anthropic Claude API for plain-language lab result explanations, plus the lab results UI (values, dates, High/Low/Normal badges)
-* **Deployment & monitoring:** Cloudflare deployment config, proxy server, and Sentry error monitoring
-
-## Features
-* User authentication (register/login) backed by Supabase
-* Personal patient profile stored per user
-* Real lab results and conditions pulled from SMART on FHIR sandbox
-* AI-powered plain-language explanations of lab results via Anthropic Claude
-* PDF document upload and management per user
-
-## Tech Stack
-* **Frontend:** React, Vite, Material UI
-* **Database & Auth:** Supabase
-* **FHIR Data:** SMART Health IT sandbox (r4.smarthealthit.org)
-* **AI:** Anthropic Claude API
-* **Deployment:** Cloudflare
-
-## Environment Variables
-Create a `.env` file in the project root with the following:
-```bash
-VITE_ANTHROPIC_API_KEY=your-anthropic-api-key
-VITE_SUPABASE_URL=your-supabase-project-url
-VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
-```
-
-## Prerequisites
-* Node.js (v16+ recommended)
-* npm (comes with Node.js)
-* Recommended: VS Code with the "Prettier - Code formatter" extension by esbenp
-
-## Install dependencies
-From the project root (where `package.json` lives):
-```bash
-npm install
-```
-If you hit missing package errors for MUI icons, install them:
-```bash
-npm install @mui/icons-material
-```
-(You likely already have `@mui/material` and its peers. If not, run `npm install @mui/material @emotion/react @emotion/styled`.)
-
-## Run the dev server
-This project uses Vite. Start the dev server with:
-```bash
-npm run dev
-```
-If your `package.json` uses a different script name, check the `scripts` section and run the appropriate command (for example `npm start`).
-Open the app at the address printed by Vite (usually http://localhost:5173).
-
-## Build for production
-```bash
-npm run build
-```
-And preview the production build locally:
-```bash
-npm run preview
-```
-
-## Formatting with Prettier
-A `.prettierrc` and `.prettierignore` are included in the repo. To install Prettier locally (dev dependency):
-```bash
-npm install --save-dev --save-exact prettier
-```
-Format the whole `src/` tree:
-```bash
-npx prettier --write "src/**/*.{js,jsx,ts,tsx,json,css,md,html}"
-```
-Or format a single file:
-```bash
-npx prettier --write src/App.jsx
-```
-### VS Code setup
-The repo includes `.vscode/settings.json` to set Prettier as the default formatter and enable format-on-save. If you use VS Code:
-1. Install the "Prettier - Code formatter" extension (esbenp.prettier-vscode).
-2. Ensure the workspace settings (in `.vscode/settings.json`) contain:
-```json
-{
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "editor.formatOnSave": true
-}
-```
-
-## Project structure (relevant files)
-* `src/App.jsx` – top-level app, routing, and auth state
-* `src/pages/Login.jsx` – Login page
-* `src/pages/Register.jsx` – Registration page
-* `src/pages/PatientProfile.jsx` – Patient profile UI (stored in Supabase)
-* `src/pages/MedicalData.jsx` – Lab results and conditions from FHIR with AI explanations
-* `src/pages/UploadReport.jsx` – PDF upload and document management
-* `src/hooks/useFhir.js` – FHIR data fetching hook
-* `src/utils/fhirUtils.js` – FHIR data transformation
-* `src/utils/openaiService.js` – Anthropic Claude AI integration
-* `src/utils/supabaseClient.js` – Supabase client
-* `src/utils/auth.js` – Authentication logic
-
-## Notes & troubleshooting
-* "Identifier has already been declared" errors
-  * This usually means a duplicate `import` exists in a file. Open the file reported by the error and remove the duplicated import line.
-* Vite HMR parse errors after editing JSX
-  * Check for valid JSX syntax (balanced tags, valid expressions inside `{}`) and valid JavaScript in `sx` props (strings for CSS units like `'24px'` or numeric values when appropriate).
-* Missing icon import resolves
-  * If you see an error about resolving `@mui/icons-material/Menu` or `@mui/icons-material/ExpandMore`, run:
-```bash
-  npm install @mui/icons-material
-```
-* API errors
-  * Make sure your `.env` file has all three keys set correctly (VITE_ANTHROPIC_API_KEY, VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY)
-* If you want Prettier to run in CI, add a `format` script to `package.json`, for example:
-```json
-"scripts": {
-  "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx,json,css,md,html}\""
-}
-```
-Then run `npm run format`.
+> [!NOTE]
+> The live demo's AI explanation feature is currently disabled. I rotated the API key after finding it exposed in the client bundle, and the fix (routing every Claude call through the server) is planned. Login, FHIR records, and lab results still work.
 
 ---
+
+## What it does
+- **Secure accounts:** registration and login with Supabase Auth, with each patient's profile protected by row-level security
+- **Real FHIR data:** retrieves Patient, Observation (labs), and Condition resources from the SMART Health IT R4 sandbox, matched to the user through name-based patient lookup
+- **Readable lab results:** values, dates, and color-coded High/Low/Normal flags
+- **Plain-language explanations:** Claude explains each lab result in two or three friendly, non-alarming sentences
+- **Document storage:** patients can upload and manage PDF reports
+
+## Architecture
+
+```mermaid
+flowchart LR
+    U[Patient browser<br/>React + Vite] -->|auth, profiles, PDFs| S[(Supabase<br/>Auth + Postgres + RLS)]
+    U -->|FHIR R4 REST| F[SMART Health IT<br/>FHIR sandbox]
+    U -->|lab values| P[Express API proxy]
+    P -->|sanitized prompt| C[Anthropic Claude]
+    U -.->|deployed on| CF[Cloudflare Pages]
+```
+
+## Responsible AI and data handling
+- **Education, not diagnosis:** the prompt limits the model to a short, non-alarming explanation and requires it to end by reminding the patient to consult their doctor
+- **Input sanitization:** the API proxy strips markup and control characters from FHIR fields and caps their length before anything reaches the model
+- **Least privilege:** row-level security means users can only read and write their own profile and documents
+- **Synthetic data only:** the FHIR sandbox contains test patients, never real health information
+- **Lesson learned:** the deployed build originally called Claude from the browser, which exposed the key. Model calls belong on the server, and the README note above tracks that fix.
+
+## Tech stack
+| Layer | Tools |
+|---|---|
+| Frontend | React, Vite, Material UI |
+| Auth & data | Supabase (Auth, PostgreSQL, row-level security, storage) |
+| Health data | HL7 FHIR R4, SMART Health IT sandbox |
+| AI | Anthropic Claude API via an Express proxy |
+| Deployment & monitoring | Cloudflare Pages, Sentry |
+
+## My role (Zachary Wallace)
+I led implementation and FHIR integration for a three-person team:
+- Built the **FHIR data layer** (`useFhir`, `fhirUtils`): fetching, parsing, and normalizing Patient, Observation, and Condition resources
+- Implemented **Supabase authentication** with FHIR patient-name verification and RLS-safe profile creation
+- Integrated **Claude** for lab explanations and built the lab results UI
+- Handled **deployment and monitoring:** Cloudflare configuration, the API proxy, and Sentry
+
+**Team:** Carmen Lam (project topic, frontend, Supabase schema) · Meenal Kumar (initial app, technical design, AI chatbot) · Zachary Wallace (implementation, FHIR integration, deployment)
+
+## Run it locally
+```bash
+npm install
+npm run dev        # frontend at http://localhost:5173
+node server/index.js   # API proxy
+```
+
+Create a `.env` in the project root:
+```bash
+VITE_SUPABASE_URL=your-supabase-project-url
+VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
+# Server-side only. Never prefix secrets with VITE_, which ships them to the browser.
+ANTHROPIC_API_KEY=your-anthropic-api-key
+SUPABASE_URL=your-supabase-project-url
+SUPABASE_SERVICE_KEY=your-supabase-service-key
+```
+
+<details>
+<summary>Project structure</summary>
+
+- `src/App.jsx`: routing and auth state
+- `src/pages/`: Login, Register, PatientProfile, MedicalData, UploadReport
+- `src/hooks/useFhir.js`: FHIR data fetching
+- `src/utils/fhirUtils.js`: FHIR parsing and normalization
+- `src/utils/auth.js`: authentication logic
+- `src/utils/supabaseClient.js`: Supabase client
+- `server/index.js`: Express proxy for Claude with input sanitization
+</details>
